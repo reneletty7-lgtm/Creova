@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Creova - Creator Dashboard</title>
+  <link rel="stylesheet" href="marketplace.css">
+  <link rel="stylesheet" href="product.css">
+</head>
+<body>
+<div class="section-head">
+  <h2><a href="profile.html" style="color:#3a1a85">‹</a> Creator Dashboard</h2>
+</div>
+<div class="stat-row" id="stats"></div>
+<div class="section-head"><h2>Orders received</h2></div>
+<div id="orders"></div>
+
+<nav class="bottom-nav">
+  <a href="home.html"><span class="icon">🏠</span>Home</a>
+  <a href="create.html"><span class="icon">✏️</span>Create</a>
+  <a href="marketplace.html"><span class="icon">🛍️</span>Marketplace</a>
+  <a href="wallet.html"><span class="icon">👛</span>Wallet</a>
+  <a href="profile.html"><span class="icon">👤</span>Profile</a>
+</nav>
+
+<script src="nav.js"></script>
+<script src="premium-core.js"></script>
+<script>
+  const me = JSON.parse(localStorage.getItem("creovaUser"));
+
+  function money(n) { return "UGX " + Number(n).toLocaleString(); }
+
+  function render() {
+    const all = readJSON("creovaOrders", []);
+    const mine = all.filter(function (o) { return o.seller === me.contact; });
+    const products = readJSON("creovaProducts", []).filter(function (p) { return p.owner === me.contact; }).length;
+    const earned = mine.reduce(function (s, o) { return s + o.net; }, 0);
+
+    document.getElementById("stats").innerHTML =
+      '<div class="stat-box"><b>' + products + "</b><span>Products</span></div>" +
+      '<div class="stat-box"><b>' + mine.length + "</b><span>Orders</span></div>" +
+      '<div class="stat-box"><b>' + money(earned) + "</b><span>Earned</span></div>";
+
+    document.getElementById("orders").innerHTML = mine.length
+      ? mine.map(function (o) {
+          const opts = [];
+          if (o.colour) opts.push("Colour: " + o.colour);
+          if (o.size) opts.push("Size: " + o.size);
+          else if (o.confirmSize) opts.push("Size: confirm with buyer on WhatsApp");
+          opts.push("Qty: " + o.qty);
+          return '<div class="ocard"><div class="otop"><b>' + escHtml(o.title) + (o.code ? " (" + escHtml(o.code) + ")" : "") + "</b>" +
+            '<span class="ostatus ' + o.status.toLowerCase() + '">' + escHtml(o.status) + "</span></div>" +
+            "<small>" + escHtml(o.no) + " · " + escHtml(o.date) + "</small>" +
+            "<small>" + escHtml(opts.join(" · ")) + "</small>" +
+            "<small>Buyer: " + escHtml(o.buyerName) + " · " + escHtml(o.buyerPhone) + "</small>" +
+            (o.location ? "<small>Deliver to: " + escHtml(o.location) + "</small>" : "") +
+            "<small>Total " + money(o.total) + " · Commission " + money(o.commission) + " · You get " + money(o.net) + "</small>" +
+            '<a class="mini-call" href="tel:' + escHtml(o.buyerPhone) + '">📞 Call buyer</a>' +
+            (o.status === "Paid" ? '<br><button class="obtn" data-id="' + o.id + '">Mark delivered</button>' : "") +
+            "</div>";
+        }).join("")
+      : '<p class="sub" style="padding:16px">No orders yet.</p>';
+
+    document.querySelectorAll(".obtn").forEach(function (b) {
+      b.onclick = function () {
+        const list = readJSON("creovaOrders", []);
+        list.forEach(function (o) { if (String(o.id) === b.dataset.id) o.status = "Delivered"; });
+        localStorage.setItem("creovaOrders", JSON.stringify(list));
+        render();
+      };
+    });
+  }
+
+  if (!me) {
+    alert("Please log in first.");
+    location.replace("login.html");
+  } else {
+    render();
+  }
+</script>
+<script src="install.js"></script>
+</body>
+</html>

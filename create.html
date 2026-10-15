@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Creova - Create</title>
+  <link rel="stylesheet" href="create.css">
+</head>
+<body>
+
+<header class="c-header">
+  <div class="logo">Creova<small>Create. Sell. Earn.</small></div>
+  <div class="head-icons"><span>🔔</span><a href="profile.html" class="user">👤</a></div>
+</header>
+
+<section class="c-banner">
+  <h1>Create Your Product or Service</h1>
+  <p>Share your skills, talent and creativity with the world. Turn your passion into income!</p>
+</section>
+
+<section class="pad">
+  <h2>What are you creating?</h2>
+  <p class="sub">Select the category that best describes what you want to offer.</p>
+  <div class="tile-grid" id="catGrid"></div>
+  <input type="text" id="otherBox" class="other-box" placeholder="Type your category" maxlength="40" hidden>
+</section>
+
+<form id="createForm" class="pad">
+  <h2>Product / Service Details</h2>
+  <div class="form-card">
+
+    <label for="title">Title <i>*</i></label>
+    <input type="text" id="title" maxlength="80" placeholder="Enter a catchy title for your product or service...">
+
+    <label for="description">Description <i>*</i></label>
+    <textarea id="description" maxlength="1000" rows="4" placeholder="Describe what you offer, including features, size, delivery details, etc..."></textarea>
+    <div class="counter" id="counter">0/1000</div>
+
+    <div class="two-col">
+      <div>
+        <label for="category">Category <i>*</i></label>
+        <select id="category"><option value="">Select a category</option></select>
+      </div>
+      <div>
+        <label for="price">Price (UGX) <i>*</i></label>
+        <input type="number" id="price" inputmode="numeric" min="1" placeholder="Your price">
+      </div>
+    </div>
+
+    <label for="colours">Colours (optional)</label>
+    <input type="text" id="colours" maxlength="120" placeholder="e.g. Red, Blue, Black">
+
+    <label for="sizes">Sizes (optional)</label>
+    <input type="text" id="sizes" maxlength="120" placeholder="e.g. S, M, L, XL or 38, 39, 40">
+    <small style="display:block;margin-top:6px;color:#777;font-size:12px">Separate with commas. Buyers choose from the colours and sizes you list.</small>
+
+    <label>Upload Images <i>*</i></label>
+    <label for="fileInput" class="upload">
+      <span class="up-icon">☁️</span>
+      <b>Tap to upload</b>
+      <small>JPG, PNG · free plan: up to 10 photos per product</small>
+    </label>
+    <input type="file" id="fileInput" accept="image/*" multiple hidden>
+    <small id="photoCount" style="display:block;margin-top:8px;color:#777;font-size:12px"></small>
+    <div class="previews" id="previews"></div>
+
+    <label>Location / Delivery</label>
+    <label class="radio"><input type="radio" name="delivery" value="online" checked> I will deliver / offer this service online or at my location</label>
+    <label class="radio"><input type="radio" name="delivery" value="shipping"> Shipping / Delivery required</label>
+
+    <p id="msg" class="msg" hidden></p>
+    <button type="submit" class="submit">⊕ Create Product / Service</button>
+  </div>
+</form>
+
+<nav class="bottom-nav">
+  <a href="home.html"><span class="icon">🏠</span>Home</a>
+  <a href="create.html"><span class="icon">✏️</span>Create</a>
+  <a href="marketplace.html"><span class="icon">🛍️</span>Marketplace</a>
+  <a href="wallet.html"><span class="icon">👛</span>Wallet</a>
+  <a href="profile.html"><span class="icon">👤</span>Profile</a>
+</nav>
+
+<script src="nav.js"></script>
+<script src="premium-core.js"></script>
+<script src="create.js"></script>
+<script src="install.js"></script>
+</body>
+</html>
