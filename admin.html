@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Creova - Admin</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<header class="a-header">
+  <h1>Admin: Withdrawals</h1>
+  <a href="home.html">Exit</a>
+</header>
+
+<section class="box">
+  <h2>Add test funds</h2>
+  <p class="hint">Gives the wallet a balance so you can test withdrawals.</p>
+  <div class="row">
+    <input type="number" id="fundAmount" inputmode="numeric" placeholder="e.g. 100000">
+    <button type="button" id="fundBtn">Add</button>
+  </div>
+  <p id="fundMsg" class="hint"></p>
+</section>
+<section class="box">
+  <h2>Creova earnings</h2>
+  <div id="earn"></div>
+</section>
+
+<section class="box">
+  <div class="tabs">
+    <button type="button" class="tab on" data-f="All">All</button>
+    <button type="button" class="tab" data-f="Pending">Pending</button>
+    <button type="button" class="tab" data-f="Successful">Successful</button>
+    <button type="button" class="tab" data-f="Declined">Declined</button>
+  </div>
+  <div id="list"></div>
+</section>
+
+<script src="admin.js"></script>
+</body>
+</html>

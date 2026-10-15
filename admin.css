@@ -1,0 +1,35 @@
+* { box-sizing: border-box; }
+body { margin: 0; padding-bottom: 30px; font-family: Arial, sans-serif; background: #f8f6ff; color: #2a1a5e; }
+
+.a-header { display: flex; justify-content: space-between; align-items: center; background: #3a1a85; color: #fff; padding: 16px; }
+.a-header h1 { margin: 0; font-size: 20px; }
+.a-header a { color: #fff; font-size: 14px; }
+
+.box { background: #fff; border: 1px solid #e6defa; border-radius: 16px; margin: 14px 16px; padding: 14px; }
+.box h2 { margin: 0 0 4px; font-size: 17px; }
+.hint { margin: 4px 0 10px; font-size: 12px; color: #777; }
+.row { display: flex; gap: 8px; }
+.row input { flex: 1; padding: 12px; border: 1px solid #cfc3f3; border-radius: 10px; font-size: 15px; }
+.row button { padding: 12px 20px; border: none; border-radius: 10px; background: #5b2fd0; color: #fff; font-weight: bold; cursor: pointer; }
+
+.tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; }
+.tab { flex: none; padding: 9px 14px; border: 2px solid #e0d7fa; border-radius: 20px; background: #fff; color: #5b2fd0; font-weight: bold; font-size: 13px; cursor: pointer; }
+.tab.on { background: #5b2fd0; border-color: #5b2fd0; color: #fff; }
+
+.item { border: 1px solid #eee; border-radius: 14px; padding: 14px; margin-top: 10px; }
+.item-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.item-top b { font-size: 18px; }
+.item small { display: block; color: #666; font-size: 12px; line-height: 1.6; }
+.item .pay { margin-top: 6px; font-size: 13px; color: #2a1a5e; font-weight: bold; }
+
+.badge { padding: 5px 12px; border-radius: 14px; font-size: 12px; font-weight: bold; }
+.badge.pending { background: #fff3cd; color: #8a6100; }
+.badge.successful { background: #dff5e3; color: #1b6b32; }
+.badge.declined { background: #ffe0e0; color: #b00020; }
+
+.actions { display: flex; gap: 8px; margin-top: 12px; }
+.actions button { flex: 1; padding: 12px; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; }
+.approve { background: #1b9e4b; color: #fff; }
+.decline { background: #fff; color: #d33; border: 1px solid #d33 !important; }
+
+.empty { text-align: center; color: #777; font-size: 14px; padding: 24px 0; }

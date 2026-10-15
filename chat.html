@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Creova - Chat</title>
+  <link rel="stylesheet" href="chat.css">
+</head>
+<body class="chat-page">
+
+<div class="c-top">
+  <a href="messages.html">‹</a>
+  <div><b id="who">Chat</b><small id="roleLine"></small></div>
+</div>
+
+<div id="pchip" class="pchip" hidden></div>
+<div id="msgs"></div>
+
+<div id="lockBox" class="lockbox" hidden>
+  🔒 <b>Upgrade to Premium to reply.</b><br>
+  Customers can message you for free, but only Premium sellers can answer them.<br>
+  <a href="premium.html">Upgrade to Premium</a>
+</div>
+
+<div class="sendbar" id="sendbar">
+  <textarea id="text" rows="1" maxlength="500" placeholder="Type a message…"></textarea>
+  <button type="button" id="sendBtn">Send</button>
+</div>
+
+<script src="premium-core.js"></script>
+<script src="chat-core.js"></script>
+<script>
+  const me = JSON.parse(localStorage.getItem("creovaUser"));
+  const box = document.getElementById("msgs");
+
+  if (!me) {
+    alert("Please log in first.");
+    location.replace("login.html");
+  } else {
+    start();
+  }
+
+  function fmt(t) {
+    return new Date(t).toLocaleString("en-GB", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
+  }
+
+  function start() {
+    const params = new URLSearchParams(location.search);
+    const id = params.get("c");
+    const pid = Number(params.get("p")) || 0;
+    const input = document.getElementById("text");
+    const lockBox = document.getElementById("lockBox");
+    const bar = document.getElementById("sendbar");
+
+    const first = getChats().find(function (x) { return x.id === id; });
+    const role = first ? (first.seller === me.contact ? "seller" : (first.buyer === me.contact ? "buyer" : "")) : "";
+
+    if (!first || !role) {
+      box.innerHTML = '<p class="empty">Conversation not found.</p>';
+      bar.hidden = true;
+      return;
+    }
+
+    document.getElementById("who").textContent = role === "seller" ? first.buyerName : first.sellerName;
+
+    function roleLine() {
+      document.getElementById("roleLine").textContent = role === "seller"
+        ? (isPro(me.contact) ? "Customer" : "Customer · 🔒 Premium needed to reply")
+        : "Seller";
+    }
+    roleLine();
+
+    // which product is this about?
+    if (pid) {
+      const p = readJSON("creovaProducts", []).find(function (x) { return x.id === pid; });
+      if (p) {
+        const chip = document.getElementById("pchip");
+        chip.innerHTML = "About: <b>" + escHtml(p.title) + "</b>" + (p.code ? " (" + escHtml(p.code) + ")" : "") +
+          " · UGX " + Number(p.price).toLocaleString() + ' · <a href="product.html?id=' + p.id + '">View</a>';
+        chip.hidden = false;
+        if (role === "buyer" && first.messages.length === 0) {
+          input.value = "Hi, I'm interested in " + p.title + (p.code ? " (" + p.code + ")" : "") + ". Is it available?";
+        }
+      }
+    }
+
+    function render() {
+      const all = getChats();
+      const c = all.find(function (x) { return x.id === id; });
+      if (!c) return;
+
+      const key = role === "seller" ? "unreadSeller" : "unreadBuyer";
+      if (c[key]) { c[key] = 0; saveChats(all); }
+
+      box.innerHTML = c.messages.length
+        ? c.messages.map(function (m) {
+            return '<div class="bub ' + (m.from === role ? "me" : "them") + '">' +
+              escHtml(m.text).replace(/\n/g, "<br>") + "<small>" + fmt(m.t) + "</small></div>";
+          }).join("")
+        : '<p class="empty">' + (role === "buyer" ? "Say hello to the seller 👋" : "No messages yet.") + "</p>";
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function send() {
+      const text = input.value.trim();
+      if (!text) return;
+
+      // sellers need Premium to reply
+      if (role === "seller" && !isPro(me.contact)) {
+        lockBox.hidden = false;
+        return;
+      }
+
+      const all = getChats();
+      const c = all.find(function (x) { return x.id === id; });
+      c.messages.push({ from: role, text: text, t: Date.now() });
+      c.updated = Date.now();
+      if (role === "buyer") c.unreadSeller = (c.unreadSeller || 0) + 1;
+      else c.unreadBuyer = (c.unreadBuyer || 0) + 1;
+      saveChats(all);
+
+      input.value = "";
+      lockBox.hidden = true;
+      render();
+    }
+
+    document.getElementById("sendBtn").onclick = send;
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); }
+    });
+
+    // coming back after upgrading
+    window.addEventListener("pageshow", function () {
+      if (role !== "seller" || isPro(me.contact)) lockBox.hidden = true;
+      roleLine();
+    });
+    window.addEventListener("storage", render);
+
+    render();
+  }
+</script>
+</body>
+</html>
