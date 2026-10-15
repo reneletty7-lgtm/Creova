@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Creova - Premium</title>
+  <link rel="stylesheet" href="premium.css">
+</head>
+<body>
+
+<header class="p-header">
+  <a href="profile.html">‹</a>
+  <h1>Premium &amp; Boost</h1>
+</header>
+
+<div class="balance">
+  <div>
+    <small>Your plan</small>
+    <b id="plan"></b>
+    <small>Pay with MTN or Airtel Mobile Money</small>
+  </div>
+</div>
+
+<p id="msg" class="msg" hidden></p>
+<div id="cards"></div>
+
+<div id="payModal" class="overlay" hidden>
+  <div class="sheet">
+    <div id="payForm">
+      <h3 id="payTitle">Pay with Mobile Money</h3>
+      <p id="payAmount" class="pay-amount"></p>
+      <div class="nets">
+        <button type="button" class="net mtn on" data-net="MTN">MTN</button>
+        <button type="button" class="net airtel" data-net="Airtel">Airtel</button>
+      </div>
+      <input type="tel" id="payPhone" inputmode="numeric" maxlength="10" placeholder="e.g. 0771234567">
+      <p id="payErr" class="msg error" hidden></p>
+      <button type="button" id="payGo" class="buy wide">Pay now</button>
+      <button type="button" id="payCancel" class="cancel">Cancel</button>
+      <small class="demo-note">Demo mode: no real money is charged.</small>
+    </div>
+    <div id="payWait" hidden>
+      <div class="spinner"></div>
+      <h3>Check your phone</h3>
+      <p>A payment prompt was sent to <b id="waitNum"></b>. Enter your PIN to approve.</p>
+    </div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <a href="home.html"><span class="icon">🏠</span>Home</a>
+  <a href="create.html"><span class="icon">✏️</span>Create</a>
+  <a href="marketplace.html"><span class="icon">🛍️</span>Marketplace</a>
+  <a href="wallet.html"><span class="icon">👛</span>Wallet</a>
+  <a href="profile.html"><span class="icon">👤</span>Profile</a>
+</nav>
+
+<script src="nav.js"></script>
+<script src="premium-core.js"></script>
+<script src="premium.js"></script>
+<script src="install.js"></script>
+</body>
+</html>

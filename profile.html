@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Creova - Profile</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="profile-body">
+
+<div class="profile-page">
+  <div class="top-bar">
+    <a href="home.html" class="back">‹</a>
+    <span class="brand">Creova</span>
+  </div>
+
+  <label for="photoInput" class="avatar-wrap">
+    <div id="avatar">R</div>
+    <span class="camera">📷</span>
+  </label>
+  <input type="file" id="photoInput" accept="image/*" hidden>
+
+  <h1 id="profileName">Creator Profile</h1>
+  <p class="handle" id="profileContact"></p>
+  <p class="detail-line" id="detailLine"></p>
+  <button type="button" class="edit-btn" id="editBtn">✏️ Edit phone &amp; location</button>
+
+  <form id="detailsForm" class="details-card" hidden>
+    <label for="phoneInput">📞 Phone number</label>
+    <input type="tel" id="phoneInput" inputmode="numeric" maxlength="10" placeholder="e.g. 0771234567">
+
+    <label for="locInput">📍 Location</label>
+    <input type="text" id="locInput" maxlength="60" placeholder="e.g. Kampala, Uganda">
+
+    <small class="note">Shown on your shop so buyers can contact you.</small>
+    <p id="detailMsg" class="d-msg" hidden></p>
+    <button type="submit" class="save-btn">Save</button>
+  </form>
+
+  <div class="stats">
+    <div class="stat"><b>0</b><span>Products</span></div>
+    <div class="stat"><b>0</b><span>Sales</span></div>
+    <div class="stat"><b>UGX 0</b><span>Earnings</span></div>
+  </div>
+
+  <a href="shop.html?id=me" class="menu-item">🛍️ My Products <span>›</span></a>
+  <a href="my-purchases.html" class="menu-item">🛒 My Purchases <span>›</span></a>
+  <a href="downloads.html" class="menu-item">⬇️ Downloads <span>›</span></a>
+  <a href="my-reviews.html" class="menu-item">⭐ My Reviews <span>›</span></a>
+  <a href="dashboard.html" class="menu-item">📊 Creator Dashboard <span>›</span></a>
+  <a href="shop.html?id=me#share" class="menu-item">🔗 Share my shop <span>›</span></a>
+  <a href="messages.html" class="menu-item">💬 Messages <span id="msgCount">›</span></a>
+<a href="#" class="menu-item" data-notify hidden>🔔 Turn on message alerts <span>›</span></a>
+  <a href="#" class="menu-item" data-install hidden>📲 Install Creova app <span>›</span></a>
+  <a href="premium.html" class="menu-item">⭐ Premium &amp; Boost <span>›</span></a>
+</div>
+
+<nav class="bottom-nav">
+  <a href="home.html"><span class="icon">🏠</span>Home</a>
+  <a href="create.html"><span class="icon">✏️</span>Create</a>
+  <a href="marketplace.html"><span class="icon">🛍️</span>Marketplace</a>
+  <a href="wallet.html"><span class="icon">👛</span>Wallet</a>
+  <a href="profile.html"><span class="icon">👤</span>Profile</a>
+</nav>
+
+<script src="nav.js"></script>
+<script src="profile.js"></script>
+<script src="install.js"></script>
+</body>
+</html>

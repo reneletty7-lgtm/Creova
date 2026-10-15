@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Creova - Product</title>
+  <link rel="stylesheet" href="marketplace.css">
+  <link rel="stylesheet" href="product.css">
+</head>
+<body>
+<div class="section-head">
+  <h2><a id="backLink" href="shops.html" style="color:#3a1a85">‹</a> Product</h2>
+</div>
+<div id="productPage"><p class="sub" style="padding:16px">Loading…</p></div>
+
+<a id="chatBtn" class="chat" href="#" hidden>💬 Chat with us</a>
+
+<div id="orderModal" class="overlay" hidden>
+  <div class="sheet">
+
+    <div id="orderForm">
+      <h3>Order summary</h3>
+      <p id="sumLine" class="sum"></p>
+
+      <label for="oName">Your name</label>
+      <input type="text" id="oName" maxlength="40">
+
+      <label for="oPhone">Your phone number</label>
+      <input type="tel" id="oPhone" inputmode="numeric" maxlength="10" placeholder="e.g. 0771234567">
+
+      <label for="oLoc" id="locLabel">Delivery location</label>
+      <input type="text" id="oLoc" maxlength="80" placeholder="e.g. Lubaga, Kampala">
+
+      <label>Quantity</label>
+      <div class="qty">
+        <button type="button" id="qMinus">−</button>
+        <b id="qVal">1</b>
+        <button type="button" id="qPlus">+</button>
+      </div>
+
+      <div class="totalbox"><span>Total</span><b id="total"></b></div>
+
+      <label>Pay with Mobile Money</label>
+      <div class="nets">
+        <button type="button" class="net mtn on" data-net="MTN">MTN</button>
+        <button type="button" class="net airtel" data-net="Airtel">Airtel</button>
+      </div>
+      <input type="tel" id="payPhone" inputmode="numeric" maxlength="10" placeholder="Mobile money number">
+
+      <p id="orderErr" class="errbox" hidden></p>
+      <button type="button" id="payBtn" class="order-btn">Pay now</button>
+      <button type="button" id="orderCancel" class="cancel">Cancel</button>
+      <small class="demo-note">Demo mode: no real money is charged.</small>
+    </div>
+
+    <div id="orderWait" class="center" hidden>
+      <div class="spinner"></div>
+      <h3>Check your phone</h3>
+      <p>A payment prompt was sent to <b id="waitNum"></b>. Enter your PIN to approve.</p>
+    </div>
+
+    <div id="orderDone" class="center" hidden>
+      <div class="okmark">✅</div>
+      <h3>Order placed!</h3>
+      <p id="doneText"></p>
+      <a href="my-purchases.html" class="order-btn" style="text-align:center">View my orders</a>
+      <button type="button" class="cancel" id="doneClose">Close</button>
+    </div>
+
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <a href="home.html"><span class="icon">🏠</span>Home</a>
+  <a href="create.html"><span class="icon">✏️</span>Create</a>
+  <a href="marketplace.html"><span class="icon">🛍️</span>Marketplace</a>
+  <a href="wallet.html"><span class="icon">👛</span>Wallet</a>
+  <a href="profile.html"><span class="icon">👤</span>Profile</a>
+</nav>
+
+<script>
+  window.onerror = function (msg, src, line) {
+    document.body.insertAdjacentHTML("beforeend",
+      '<pre style="color:#b00020;background:#ffe5e5;padding:12px;margin:16px;white-space:pre-wrap">Error: ' +
+      msg + "\nFile: " + String(src).split("/").pop() + "\nLine: " + line + "</pre>");
+  };
+</script>
+
+<script src="nav.js"></script>
+<script src="premium-core.js"></script>
+<script src="shops.js"></script>
+<script src="chat-core.js"></script>
+
+<script>
+  const PREFIXES = {
+    MTN: ["076", "077", "078", "039"],
+    Airtel: ["070", "074", "075", "020"]
+  };
+  const me = JSON.parse(localStorage.getItem("creovaUser"));
+  const pid = Number(new URLSearchParams(location.search).get("id"));
+  const product = getProducts().find(function (p) { return p.id === pid; });
+  const page = document.getElementById("productPage");
+
+  if (!product) {
+    page.innerHTML = '<p class="sub" style="padding:16px">Product not found.</p>';
+  } else {
+    start();
+  }
+
+  function start() {
+    const owner = product.owner;
+    const imgs = product.images || [];
+    const colours = product.colours || [];
+    const sizes = product.sizes || [];
+    const unit = Number(product.price);
+    const isOwn = !!(me && me.contact === owner);
+    let colour = "";
+    let size = "";
+    let confirmSize = false;
+    let qty = 1;
+    let network = "MTN";
+
+    let det = {};
+    try { det = (JSON.parse(localStorage.getItem("creovaDetails")) || {})[owner] || {}; } catch (e) { det = {}; }
+    const sellerPhone = det.phone || (/^0\d{9}$/.test(owner) ? owner : "");
+
+    document.getElementById("backLink").href = "shop.html?s=" + getShopSlug(owner, product.ownerName);
+    document.title = "Creova - " + product.title;
+
+    const meta = [];
+    if (product.code) meta.push("Item " + product.code);
+    if (colours.length) meta.push(colours.length + (colours.length === 1 ? " colour" : " colours"));
+
+    // ----- colours -----
+    let colourHtml = "";
+    if (colours.length) {
+      colourHtml += '<h3 class="step">1. Choose a colour</h3>';
+      colourHtml += '<div class="chips" id="colourChips">';
+      colours.forEach(function (c) {
+        colourHtml += `<button type="button" class="chip" data-v="${esc(c)}"><i class="sw" style="background:${esc(swatchColor(c))}"></i>${esc(c)}</button>`;
+      });
+      colourHtml += "</div>";
+    }
+
+    // ----- sizes -----
+    let sizeHtml = "";
+    if (sizes.length) {
+      const stepNo = colours.length ? "2. " : "1. ";
+      sizeHtml += `<h3 class="step">${stepNo}Choose a size</h3>`;
+      if (colours.length) {
+        sizeHtml += '<p class="hintline" id="sizeHint">Select a colour to see size options.</p>';
+      }
+      const off = colours.length ? " off" : "";
+      sizeHtml += `<div class="chips${off}" id="sizeChips">`;
+      sizes.forEach(function (s) {
+        sizeHtml += `<button type="button" class="chip" data-v="${esc(s)}">${esc(s)}</button>`;
+      });
+      sizeHtml += "</div>";
+      sizeHtml += '<label class="confirm"><span>Confirm my size on WhatsApp</span><input type="checkbox" id="confirmSize"></label>';
+    }
+
+    // ----- gallery -----
+    let galleryHtml = '<div class="gallery"><div class="main-img">';
+    if (imgs.length) {
+      galleryHtml += `<img id="mainImg" src="${imgs[0]}" alt=""><span class="counter" id="counter">1 / ${imgs.length}</span>`;
+    } else {
+      galleryHtml += '<span class="noimg">🛍️</span>';
+    }
+    galleryHtml += "</div>";
+    if (imgs.length > 1) {
+      galleryHtml += '<div class="thumbs">';
+      imgs.forEach(function (s, i) {
+        const on = i === 0 ? " on" : "";
+        galleryHtml += `<img class="th${on}" data-i="${i}" src="${s}" alt="">`;
+      });
+      galleryHtml += "</div>";
+    }
+    galleryHtml += "</div>";
+
+    // ----- details -----
+    let detail = '<div class="pdetail">';
+    if (product.category) detail += `<p class="pcat-line">${esc(product.category)}</p>`;
+    detail += `<h1 class="ptitle">${esc(product.title)}</h1>`;
+    if (meta.length) detail += `<p class="pmeta">${esc(meta.join("  ·  "))}</p>`;
+    detail += `<p class="pprice">UGX ${unit.toLocaleString()}</p>`;
+    detail += '<p class="pnote">Price in Ugandan shillings.</p>';
+    if (product.description) {
+      const text = esc(product.description).replace(/\n/g, "<br>");
+      detail += `<p class="pdesc">${text}</p>`;
+    }
+    detail += colourHtml;
+    detail += sizeHtml;
+    detail += '<p class="infoline" id="infoLine"></p>';
+    detail += '<button type="button" class="order-btn" id="orderBtn">🛒 Order now</button>';
+    detail += '<button type="button" class="msg-btn" id="msgBtn">💬 Message the seller</button>';
+    detail += "</div>";
+
+    page.innerHTML = galleryHtml + detail;
+
+    const info = document.getElementById("infoLine");
+    const orderBtn = document.getElementById("orderBtn");
+    const sizeBox = document.getElementById("sizeChips");
+
+    // gallery
+    const mainImg = document.getElementById("mainImg");
+    page.querySelectorAll(".th").forEach(function (t) {
+      t.onclick = function () {
+        const i = Number(t.dataset.i);
+        mainImg.src = imgs[i];
+        document.getElementById("counter").textContent = (i + 1) + " / " + imgs.length;
+        page.querySelectorAll(".th").forEach(function (x) { x.classList.remove("on"); });
+        t.classList.add("on");
+      };
+    });
+
+    function missing() {
+      if (colours.length && !colour) return "Choose a colour to check the details.";
+      if (sizes.length && !size && !confirmSize) return "Choose a size, or tick “Confirm my size on WhatsApp”.";
+      return "";
+    }
+
+    function refreshInfo() {
+      info.classList.remove("bad");
+      if (isOwn) {
+        info.textContent = "This is your own product, so you can't order it.";
+        orderBtn.classList.add("off");
+        return;
+      }
+      const m = missing();
+      const picked = [];
+      if (colour) picked.push(colour);
+      if (size) picked.push("Size " + size);
+      else if (confirmSize) picked.push("size to be confirmed on WhatsApp");
+      info.textContent = m || (picked.length ? "Selected: " + picked.join(" · ") : "Ready to order.");
+      orderBtn.classList.toggle("off", !!m);
+    }
+
+    page.querySelectorAll("#colourChips .chip").forEach(function (chip) {
+      chip.onclick = function () {
+        colour = chip.dataset.v;
+        page.querySelectorAll("#colourChips .chip").forEach(function (x) { x.classList.remove("on"); });
+        chip.classList.add("on");
+        if (sizeBox) sizeBox.classList.remove("off");
+        const hint = document.getElementById("sizeHint");
+        if (hint) hint.hidden = true;
+        refreshInfo();
+      };
+    });
+
+    page.querySelectorAll("#sizeChips .chip").forEach(function (chip) {
+      chip.onclick = function () {
+        size = chip.dataset.v;
+        page.querySelectorAll("#sizeChips .chip").forEach(function (x) { x.classList.remove("on"); });
+        chip.classList.add("on");
+        refreshInfo();
+      };
+    });
+
+    const confirmBox = document.getElementById("confirmSize");
+    if (confirmBox) {
+      confirmBox.onchange = function () { confirmSize = confirmBox.checked; refreshInfo(); };
+    }
+
+    // chat with the seller on WhatsApp
+    const chat = document.getElementById("chatBtn");
+    if (sellerPhone && !isOwn) {
+      const hello = "Hello! I'm interested in " + product.title + (product.code ? " (" + product.code + ")" : "") + " on Creova.";
+      chat.href = "https://wa.me/256" + sellerPhone.slice(1) + "?text=" + encodeURIComponent(hello);
+      chat.hidden = false;
+    }
+
+    // message the seller inside Creova
+    const msgBtn = document.getElementById("msgBtn");
+    if (isOwn) {
+      msgBtn.hidden = true;
+    } else {
+      msgBtn.onclick = function () {
+        if (!me) { alert("Please log in to message the seller."); location.href = "login.html"; return; }
+        const sellerName = product.ownerName ? product.ownerName + "'s Shop" : "Shop";
+        const cid = startChat(me, owner, sellerName);
+        location.href = "chat.html?c=" + encodeURIComponent(cid) + "&p=" + product.id;
+      };
+    }
+
+    // ----- order sheet -----
+    const modal = document.getElementById("orderModal");
+    const form = document.getElementById("orderForm");
+    const wait = document.getElementById("orderWait");
+    const done = document.getElementById("orderDone");
+    const err = document.getElementById("orderErr");
+    const oName = document.getElementById("oName");
+    const oPhone = document.getElementById("oPhone");
+    const oLoc = document.getElementById("oLoc");
+    const payPhone = document.getElementById("payPhone");
+    const needsAddress = product.delivery === "shipping";
+
+    function updateTotal() {
+      const total = unit * qty;
+      document.getElementById("qVal").textContent = qty;
+      document.getElementById("total").textContent = "UGX " + total.toLocaleString();
+      document.getElementById("payBtn").textContent = "Pay UGX " + total.toLocaleString();
+    }
+
+    function showErr(text) {
+      err.textContent = text;
+      err.hidden = false;
+    }
+
+    orderBtn.onclick = function () {
+      if (isOwn) return;
+      const m = missing();
+      if (m) { info.textContent = m; info.classList.add("bad"); return; }
+      if (!me) { alert("Please log in to order."); location.href = "login.html"; return; }
+
+      const myDet = (JSON.parse(localStorage.getItem("creovaDetails") || "{}"))[me.contact] || {};
+      const myPhone = myDet.phone || (/^0\d{9}$/.test(me.contact) ? me.contact : "");
+      oName.value = me.name;
+      oPhone.value = myPhone;
+      payPhone.value = myPhone;
+      oLoc.value = myDet.location || "";
+      document.getElementById("locLabel").textContent = needsAddress ? "Delivery address *" : "Your location (optional)";
+
+      const parts = [product.title];
+      if (colour) parts.push(colour);
+      if (size) parts.push("Size " + size);
+      else if (confirmSize) parts.push("size to be confirmed on WhatsApp");
+      document.getElementById("sumLine").textContent = parts.join(" · ");
+
+      err.hidden = true;
+      form.hidden = false;
+      wait.hidden = true;
+      done.hidden = true;
+      qty = 1;
+      updateTotal();
+      modal.hidden = false;
+    };
+
+    document.getElementById("qMinus").onclick = function () { if (qty > 1) { qty--; updateTotal(); } };
+    document.getElementById("qPlus").onclick = function () { if (qty < 10) { qty++; updateTotal(); } };
+    document.getElementById("orderCancel").onclick = function () { modal.hidden = true; };
+    document.getElementById("doneClose").onclick = function () { modal.hidden = true; };
+
+    [oPhone, payPhone].forEach(function (el) {
+      el.addEventListener("input", function () { this.value = this.value.replace(/\D/g, ""); });
+    });
+
+    document.querySelectorAll(".net").forEach(function (b) {
+      b.onclick = function () {
+        network = b.dataset.net;
+        document.querySelectorAll(".net").forEach(function (x) { x.classList.remove("on"); });
+        b.classList.add("on");
+      };
+    });
+
+    document.getElementById("payBtn").onclick = function () {
+      const name = oName.value.trim();
+      const phone = oPhone.value.trim();
+      const loc = oLoc.value.trim();
+      const number = payPhone.value.trim();
+
+      if (name.length < 2) { showErr("Enter your name."); return; }
+      if (!/^0\d{9}$/.test(phone)) { showErr("Enter a valid 10-digit phone number, e.g. 0771234567."); return; }
+      if (needsAddress && loc.length < 3) { showErr("Enter your delivery address."); return; }
+      if (!/^0\d{9}$/.test(number)) { showErr("Enter a valid 10-digit mobile money number."); return; }
+      if (PREFIXES[network].indexOf(number.slice(0, 3)) === -1) {
+        showErr("This doesn't look like an " + network + " number. Check it or switch network.");
+        return;
+      }
+
+      err.hidden = true;
+      document.getElementById("waitNum").textContent = number;
+      form.hidden = true;
+      wait.hidden = false;
+
+      const total = unit * qty;
+
+      requestMobileMoneyPayment({ amount: total, network: network, number: number, reason: "Order: " + product.title })
+        .then(function (res) {
+          if (!res.ok) {
+            wait.hidden = true;
+            form.hidden = false;
+            showErr(res.error || "Payment failed. Please try again.");
+            return;
+          }
+
+          const commission = commissionFor(owner, total);
+          const net = total - commission;
+          const no = "ORD-" + String(Date.now()).slice(-6);
+
+          const orders = readJSON("creovaOrders", []);
+          orders.unshift({
+            id: Date.now(), no: no,
+            productId: product.id, title: product.title, code: product.code || "",
+            seller: owner, sellerName: product.ownerName || "",
+            buyer: me.contact, buyerName: name, buyerPhone: phone, location: loc,
+            colour: colour, size: size, confirmSize: confirmSize,
+            qty: qty, unit: unit, total: total, commission: commission, net: net,
+            pay: network + " " + number, ref: res.ref,
+            status: "Paid", date: new Date().toLocaleString("en-GB")
+          });
+          localStorage.setItem("creovaOrders", JSON.stringify(orders));
+
+          // seller earnings (after Creova's commission)
+          const w = readJSON("creovaWallet", { total: 0, balance: 0, withdrawn: 0 });
+          w.total += net;
+          w.balance += net;
+          localStorage.setItem("creovaWallet", JSON.stringify(w));
+
+          recordRevenue(owner, "commission", commission, network + " " + number, res.ref);
+
+          wait.hidden = true;
+          done.hidden = false;
+          document.getElementById("doneText").textContent =
+            "Order " + no + " · UGX " + total.toLocaleString() + ". The seller will contact you on " + phone + ".";
+        });
+    };
+
+    refreshInfo();
+  }
+</script>
+<script src="install.js"></script>
+</body>
+</html>
