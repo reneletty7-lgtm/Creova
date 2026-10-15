@@ -1,0 +1,94 @@
+* { box-sizing: border-box; }
+body { margin: 0; padding-bottom: 90px; font-family: Arial, sans-serif; background: #fff; color: #222; }
+a { text-decoration: none; }
+
+/* header */
+.mk-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 16px; }
+.logo { font-size: 28px; font-weight: bold; color: #4b1fa8; display: flex; flex-direction: column; }
+.logo small { font-size: 11px; font-weight: normal; color: #7a55d6; }
+.bell { font-size: 22px; }
+#search { width: 100%; padding: 12px 16px; border: 1px solid #d6c9f5; border-radius: 30px; font-size: 15px; }
+
+/* hero */
+.hero { background: linear-gradient(135deg, #efe6ff, #d9c8ff); padding: 28px 18px; }
+.hero h1 { margin: 0 0 8px; font-size: 32px; color: #3a1a85; }
+.hero p { margin: 0 0 16px; max-width: 280px; color: #333; }
+.explore { display: inline-block; background: #ffc83d; color: #222; font-weight: bold; padding: 12px 22px; border-radius: 30px; }
+
+/* section headings */
+.section-head { display: flex; justify-content: space-between; align-items: center; padding: 22px 16px 6px; }
+.section-head h2 { margin: 0; font-size: 20px; color: #3a1a85; }
+.section-head a { color: #6c3fe0; font-size: 14px; font-weight: bold; }
+.sub { margin: 0 16px 10px; font-size: 13px; color: #777; }
+
+/* categories */
+.cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; padding: 10px 16px; }
+.cat { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; padding: 16px 10px; border-radius: 16px; color: #222; }
+.cat span { font-size: 34px; }
+.cat b { font-size: 14px; }
+.cat small { font-size: 11px; color: #666; }
+
+/* scrolling rows */
+.row { display: flex; gap: 12px; overflow-x: auto; padding: 8px 16px 14px; }
+.card { flex: 0 0 160px; background: #fff; border: 1px solid #eee; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+.thumb { height: 110px; display: flex; align-items: center; justify-content: center; font-size: 46px; }
+.card h3 { margin: 10px 10px 2px; font-size: 14px; }
+.card p { margin: 0 10px 8px; font-size: 11px; color: #777; }
+.meta { display: flex; justify-content: space-between; align-items: center; padding: 0 10px 10px; font-size: 12px; font-weight: bold; }
+.tag { font-style: normal; font-size: 10px; padding: 3px 8px; border-radius: 10px; }
+.tag.service { background: #e6dcff; color: #5a2fd0; }
+.tag.product { background: #ffe9b8; color: #a36a00; }
+
+/* creators */
+.creator { flex: 0 0 140px; display: flex; flex-direction: column; align-items: center; gap: 4px; background: #f4efff; border-radius: 14px; padding: 14px 8px; text-align: center; }
+.avatar { width: 64px; height: 64px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 32px; }
+.creator b { font-size: 13px; }
+.creator small { font-size: 11px; color: #777; }
+.follow { margin-top: 6px; width: 100%; padding: 7px; border: none; border-radius: 20px; background: #6c3fe0; color: #fff; font-size: 13px; cursor: pointer; }
+.follow.on { background: #ddd; color: #333; }
+
+/* bottom nav */
+.bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; display: flex; justify-content: space-around; background: #fff; border-top: 1px solid #ddd; padding: 8px 0; }
+.bottom-nav a { display: flex; flex-direction: column; align-items: center; font-size: 12px; color: #888; }
+.bottom-nav .icon { font-size: 22px; }
+.bottom-nav a.active { color: #6c5ce7; font-weight: bold; }
+.visit { display: block; width: 100%; margin-top: 6px; padding: 7px; border: 1px solid #6c3fe0; border-radius: 20px; color: #6c3fe0; font-size: 13px; text-align: center; }
+
+.shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; padding: 10px 16px; }
+.shop-grid .creator { flex: none; }
+
+.shop-hero { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; padding: 20px 16px; background: #f4efff; }
+.shop-hero h1 { margin: 6px 0 0; color: #3a1a85; }
+.shop-hero p { margin: 4px 0; color: #555; }
+.shop-hero .follow { width: 160px; }
+.avatar.big { width: 90px; height: 90px; font-size: 46px; }
+
+.product-list { padding: 0 16px; }
+.product { display: flex; justify-content: space-between; background: #fff; border: 1px solid #eee; border-radius: 14px; padding: 16px; margin-bottom: 10px; }
+.product span { color: #6c3fe0; font-weight: bold; }
+.pcard { background: #fff; border: 1px solid #eee; border-radius: 14px; margin: 0 16px 14px; overflow: hidden; }
+.pimgs { display: flex; gap: 6px; overflow-x: auto; }
+.pimgs img { height: 200px; width: auto; max-width: 100%; object-fit: cover; }
+.pinfo { padding: 12px; }
+.pinfo b { font-size: 16px; }
+.pcat { display: inline-block; margin-left: 8px; font-size: 11px; background: #e6dcff; color: #5a2fd0; padding: 3px 8px; border-radius: 10px; }
+.pinfo p { color: #555; font-size: 14px; margin: 8px 0; }
+.prow { display: flex; justify-content: space-between; align-items: center; }
+.prow strong { color: #6c3fe0; }
+.prow em { font-size: 12px; color: #777; font-style: normal; }
+.del { margin-top: 10px; width: 100%; padding: 9px; border: 1px solid #d33; background: #fff; color: #d33; border-radius: 10px; cursor: pointer; }
+.add-btn { display: inline-block; background: #6c3fe0; color: #fff; padding: 10px 18px; border-radius: 25px; margin-top: 6px; }
+.vbadge { display: inline-block; background: #1d9bf0; color: #fff; border-radius: 50%; width: 18px; height: 18px; font-size: 11px; text-align: center; line-height: 18px; margin-left: 4px; vertical-align: middle; }
+.ftag { color: #b07a00; font-weight: bold; }
+.promo { margin-left: 8px; font-size: 11px; background: #ffe9b8; color: #a36a00; padding: 3px 8px; border-radius: 10px; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; }
+a.card { color: #222; }
+.loc { margin: 2px 0 !important; color: #555; font-size: 14px; }
+.contact-row { display: flex; gap: 10px; margin-top: 10px; }
+.contact-row a { padding: 10px 18px; border-radius: 22px; font-weight: bold; font-size: 14px; color: #fff; }
+.call { background: #6c3fe0; }
+.wa { background: #1fa855; }
+.copy { padding: 10px 14px; border-radius: 22px; border: 1px solid #6c3fe0; background: #fff; color: #6c3fe0; font-weight: bold; font-size: 13px; cursor: pointer; }
+.contact-row { flex-wrap: wrap; }
+.copy { padding: 10px 14px; border-radius: 22px; border: 1px solid #6c3fe0; background: #fff; color: #6c3fe0; font-weight: bold; font-size: 13px; cursor: pointer; }
+.contact-row { flex-wrap: wrap; }

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Creova - My Purchases</title>
+  <link rel="stylesheet" href="marketplace.css">
+  <link rel="stylesheet" href="product.css">
+</head>
+<body>
+<div class="section-head">
+  <h2><a href="profile.html" style="color:#3a1a85">‹</a> My Purchases</h2>
+</div>
+<div id="list"></div>
+
+<nav class="bottom-nav">
+  <a href="home.html"><span class="icon">🏠</span>Home</a>
+  <a href="create.html"><span class="icon">✏️</span>Create</a>
+  <a href="marketplace.html"><span class="icon">🛍️</span>Marketplace</a>
+  <a href="wallet.html"><span class="icon">👛</span>Wallet</a>
+  <a href="profile.html"><span class="icon">👤</span>Profile</a>
+</nav>
+
+<script src="nav.js"></script>
+<script src="premium-core.js"></script>
+<script>
+  const me = JSON.parse(localStorage.getItem("creovaUser"));
+  const box = document.getElementById("list");
+
+  if (!me) {
+    alert("Please log in first.");
+    location.replace("login.html");
+  } else {
+    const mine = readJSON("creovaOrders", []).filter(function (o) { return o.buyer === me.contact; });
+    box.innerHTML = mine.length
+      ? mine.map(function (o) {
+          const opts = [];
+          if (o.colour) opts.push("Colour: " + o.colour);
+          if (o.size) opts.push("Size: " + o.size);
+          else if (o.confirmSize) opts.push("Size: confirm on WhatsApp");
+          opts.push("Qty: " + o.qty);
+          return '<div class="ocard"><div class="otop"><b>' + escHtml(o.title) + '</b>' +
+            '<span class="ostatus ' + o.status.toLowerCase() + '">' + escHtml(o.status) + "</span></div>" +
+            "<small>" + escHtml(o.no) + " · " + escHtml(o.date) + "</small>" +
+            "<small>" + escHtml(opts.join(" · ")) + "</small>" +
+            "<small>Seller: " + escHtml(o.sellerName || "Shop") + "</small>" +
+            "<small>Total paid: UGX " + Number(o.total).toLocaleString() + "</small></div>";
+        }).join("")
+      : '<p class="sub" style="padding:16px">You haven\'t bought anything yet.</p>';
+  }
+</script>
+<script src="install.js"></script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Creova - Messages</title>
+  <link rel="stylesheet" href="marketplace.css">
+  <link rel="stylesheet" href="chat.css">
+</head>
+<body>
+<div class="section-head">
+  <h2><a href="profile.html" style="color:#3a1a85">‹</a> Messages</h2>
+</div>
+
+<button type="button" class="alert-btn" data-notify hidden>🔔 Turn on message alerts</button>
+
+<div id="lockTop" class="lockbox" style="margin:0 16px 12px" hidden>
+  🔒 Customers can message you, but replying needs Premium.<br>
+  <a href="premium.html">Upgrade to Premium</a>
+</div>
+
+<div id="inbox"></div>
+
+<nav class="bottom-nav">
+  <a href="home.html"><span class="icon">🏠</span>Home</a>
+  <a href="create.html"><span class="icon">✏️</span>Create</a>
+  <a href="marketplace.html"><span class="icon">🛍️</span>Marketplace</a>
+  <a href="wallet.html"><span class="icon">👛</span>Wallet</a>
+  <a href="profile.html"><span class="icon">👤</span>Profile</a>
+</nav>
+
+<script src="nav.js"></script>
+<script src="premium-core.js"></script>
+<script src="chat-core.js"></script>
+<script>
+  const me = JSON.parse(localStorage.getItem("creovaUser"));
+  const inbox = document.getElementById("inbox");
+
+  function show() {
+    const chats = getChats()
+      .filter(function (c) { return (c.buyer === me.contact || c.seller === me.contact) && c.messages.length; })
+      .sort(function (a, b) { return b.updated - a.updated; });
+
+    const locked = chats.some(function (c) { return c.seller === me.contact; }) && !isPro(me.contact);
+    document.getElementById("lockTop").hidden = !locked;
+
+    inbox.innerHTML = chats.length
+      ? chats.map(function (c) {
+          const role = c.seller === me.contact ? "seller" : "buyer";
+          const other = role === "seller" ? c.buyerName : c.sellerName;
+          const last = c.messages[c.messages.length - 1];
+          const unread = role === "seller" ? c.unreadSeller : c.unreadBuyer;
+          const snippet = ((last.from === role ? "You: " : "") + last.text).slice(0, 60);
+          return '<a class="inbox-row" href="chat.html?c=' + encodeURIComponent(c.id) + '">' +
+            '<div class="in-av">' + escHtml(String(other || "?").charAt(0).toUpperCase()) + "</div>" +
+            '<div class="in-main"><b>' + escHtml(other || "") + '</b><span class="role">' +
+            (role === "seller" ? "Customer" : "Seller") + "</span><small>" + escHtml(snippet) + "</small></div>" +
+            (unread ? '<i class="badge-n">' + unread + "</i>" : "") + "</a>";
+        }).join("")
+      : '<p class="sub" style="padding:16px">No messages yet.</p>';
+  }
+
+  if (!me) {
+    alert("Please log in first.");
+    location.replace("login.html");
+  } else {
+    show();
+    window.addEventListener("storage", show);
+    window.addEventListener("pageshow", show);
+  }
+</script>
+<script src="install.js"></script>
+</body>
+</html>
