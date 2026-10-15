@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Creova - Wallet</title>
+  <link rel="stylesheet" href="wallet.css">
+</head>
+<body>
+
+<header class="w-header">
+  <div class="logo">Creova<small>Create. Sell. Earn.</small></div>
+  <div class="head-icons"><span>🔔</span><a href="profile.html" class="user">👤</a></div>
+</header>
+
+<section class="w-banner">
+  <span class="w-icon">👛</span>
+  <div>
+    <h1>Wallet</h1>
+    <p>Track your earnings, manage your balance and withdraw your funds.</p>
+  </div>
+</section>
+
+<section class="stats">
+  <div class="stat"><span class="s-icon">🪙</span><h3>Total Earnings</h3><b id="totalEarn">UGX 0</b><p>All time earnings from sales and services.</p></div>
+  <div class="stat"><span class="s-icon">👛</span><h3>Available Balance</h3><b id="balance">UGX 0</b><p>Ready to withdraw.</p></div>
+  <div class="stat pink"><span class="s-icon">⬇️</span><h3>Withdrawn</h3><b id="withdrawn">UGX 0</b><p>Total amount you have withdrawn.</p></div>
+  <div class="stat gold"><h3>Keep Going!</h3><p>The more you create, sell and offer services, the more you earn.</p></div>
+</section>
+
+<section class="withdraw">
+  <div class="w-title">
+    <span class="w-icon small">👛</span>
+    <div><h2>Withdraw Funds</h2><p>Transfer your earnings to your mobile money account.</p></div>
+  </div>
+
+  <form id="withdrawForm" class="w-form">
+    <label for="phone">📱 Enter Mobile Number</label>
+    <div id="networkTag" class="network-tag" hidden></div>
+    <input type="tel" id="phone" inputmode="numeric" maxlength="10" placeholder="e.g. 07XXXXXXXX">
+
+    <label for="fullName">👤 Enter Name</label>
+    <input type="text" id="fullName" placeholder="Your full name as registered on mobile money">
+
+    <label for="amount">💵 Enter Amount (UGX)</label>
+    <input type="number" id="amount" inputmode="numeric" placeholder="e.g. 30000">
+    <small id="receiveText" class="receive-text"></small>
+
+    <div class="info-row">
+      <div class="info"><small>Minimum Withdrawal</small><b>UGX 30,000</b></div>
+      <div class="info"><small>Charges</small><b>20%</b><small>(deducted from the amount)</small></div>
+      <div class="info"><small>You will receive</small><b>80%</b><small>of your withdrawal amount</small></div>
+    </div>
+
+    <p id="msg" class="msg" hidden></p>
+    <button type="submit" class="submit">Submit →</button>
+
+    <div class="important">
+      <b>Important</b>
+      <ul>
+        <li>Minimum withdrawal amount is UGX 30,000.</li>
+        <li>A 20% charge will be deducted from your withdrawal amount.</li>
+        <li>Processing time may take 1–3 business days.</li>
+      </ul>
+    </div>
+  </form>
+</section>
+<section class="history">
+  <h2>Transaction History</h2>
+  <div class="tabs">
+    <button type="button" class="tab on" data-f="All">All</button>
+    <button type="button" class="tab" data-f="Pending">Pending</button>
+    <button type="button" class="tab" data-f="Successful">Successful</button>
+    <button type="button" class="tab" data-f="Declined">Declined</button>
+  </div>
+  <div id="txList"></div>
+</section>
+
+<!-- network picker -->
+<div id="picker" class="overlay" hidden>
+  <div class="sheet">
+    <h3>Choose network</h3>
+    <button type="button" class="net mtn" data-net="MTN">MTN Mobile Money</button>
+    <button type="button" class="net airtel" data-net="Airtel">Airtel Money</button>
+    <button type="button" class="cancel" id="cancelPick">Cancel</button>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <a href="home.html"><span class="icon">🏠</span>Home</a>
+  <a href="create.html"><span class="icon">✏️</span>Create</a>
+  <a href="marketplace.html"><span class="icon">🛍️</span>Marketplace</a>
+  <a href="wallet.html"><span class="icon">👛</span>Wallet</a>
+  <a href="profile.html"><span class="icon">👤</span>Profile</a>
+</nav>
+
+<script src="nav.js"></script>
+<script src="wallet.js"></script>
+<script src="install.js"></script>
+</body>
+</html>
