@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Creova - Shop</title>
+  <link rel="stylesheet" href="marketplace.css">
+  <link rel="stylesheet" href="product.css">
+</head>
+<body>
+<div class="section-head">
+  <h2><a href="shops.html" style="color:#3a1a85">‹</a> Shop</h2>
+</div>
+<div id="shopPage"><p style="padding:16px">Loading shop…</p></div>
+
+<nav class="bottom-nav">
+  <a href="home.html"><span class="icon">🏠</span>Home</a>
+  <a href="create.html"><span class="icon">✏️</span>Create</a>
+  <a href="marketplace.html"><span class="icon">🛍️</span>Marketplace</a>
+  <a href="wallet.html"><span class="icon">👛</span>Wallet</a>
+  <a href="profile.html"><span class="icon">👤</span>Profile</a>
+</nav>
+
+<script>
+  window.onerror = function (msg, src, line) {
+    document.body.insertAdjacentHTML("beforeend",
+      '<pre style="color:#b00020;background:#ffe5e5;padding:12px;margin:16px;white-space:pre-wrap">Error: ' +
+      msg + "\nFile: " + String(src).split("/").pop() + "\nLine: " + line + "</pre>");
+  };
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="nav.js"></script>
+<script src="premium-core.js"></script>
+<script src="shops.js"></script>
+<script src="chat-core.js"></script>
+<script>
+  const me = JSON.parse(localStorage.getItem("creovaUser"));
+  const params = new URLSearchParams(location.search);
+  let id = params.get("id");
+  if (params.get("s")) {
+    const o = ownerFromSlug(params.get("s"));
+    id = o ? "u:" + o : "";
+  }
+  if (id === "me") id = me ? "u:" + me.contact : "";
+
+  let shop = shops.find(function (s) { return String(s.id) === id; });
+  if (!shop && me && id === "u:" + me.contact) {
+    shop = { id: id, owner: me.contact, name: me.name + "'s Shop", icon: "🛍️", role: "Your shop", user: true };
+  }
+
+  const page = document.getElementById("shopPage");
+
+  function gridCard(p, owner) {
+    const first = (p.images || [])[0];
+    const isNew = p.created && (Date.now() - p.created) < 14 * 86400000;
+    const cols = p.colours || [];
+    const dots = cols.slice(0, 5).map(function (c) {
+      return '<i class="sw" style="background:' + esc(swatchColor(c)) + '"></i>';
+    }).join("") + (cols.length > 5 ? "<small>+" + (cols.length - 5) + "</small>" : "");
+
+    return '<div class="gwrap"><a class="gcard" href="product.html?id=' + p.id + '">' +
+      '<div class="gimg">' + (first ? '<img src="' + first + '" alt="">' : '<span class="noimg">🛍️</span>') +
+      (isNew ? '<span class="newtag">NEW</span>' : "") +
+      (isBoosted(p) ? '<span class="promotag">🔥 Promoted</span>' : "") +
+      '<span class="plus">+</span></div>' +
+      "<h3>" + esc(p.title) + "</h3>" +
+      '<div class="gprice">' + esc(p.price) + "</div>" +
+      (dots ? '<div class="dots">' + dots + "</div>" : "") +
+      '<small class="gcode">' + esc(p.code ? "Code " + p.code : (p.category || "")) + "</small></a>" +
+      (owner ? '<button class="del" data-id="' + p.id + '">Delete</button>' : "") +
+      "</div>";
+  }
+
+  function contactButtons(phone) {
+    return '<div class="contact-row">' +
+      '<a class="call" href="tel:' + esc(phone) + '">📞 Call</a>' +
+      '<a class="wa" href="https://wa.me/256' + esc(phone.slice(1)) + '">💬 WhatsApp</a>' +
+      '<button type="button" class="copy" data-num="' + esc(phone) + '">📋 Copy number</button>' +
+      "</div>";
+  }
+
+  function sharePanel(link) {
+    return '<div class="sharebox" id="share">' +
+      "<h3>🔗 Share your shop</h3>" +
+      "<p>Send this link to your customers so they can order from you.</p>" +
+      '<input type="text" id="shareLink" readonly value="' + esc(link) + '">' +
+      '<div class="share-row">' +
+      '<button type="button" id="copyLink">📋 Copy link</button>' +
+      '<button type="button" id="shareBtn">📤 Share</button>' +
+      '<a id="waShare" class="wabtn" href="#">💬 WhatsApp</a></div>' +
+      '<button type="button" id="dlCard" class="dl">⬇ Download shop card (QR code)</button>' +
+      "<small>Customers can tap the link or scan the QR code.</small>" +
+      '<div id="qrBox" style="display:none"></div></div>';
+  }
+
+  function copyText(text, btn) {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(function () { btn.textContent = "✔ Copied"; });
+    } else {
+      prompt("Copy this:", text);
+    }
+  }
+
+  function downloadCard(name, link) {
+    const qr = document.querySelector("#qrBox canvas");
+    if (!qr) { alert("The QR code isn't ready yet. Please try again."); return; }
+    const c = document.createElement("canvas");
+    c.width = 600;
+    c.height = 780;
+    const x = c.getContext("2d");
+    x.fillStyle = "#ffffff";
+    x.fillRect(0, 0, 600, 780);
+    x.fillStyle = "#3a1a85";
+    x.fillRect(0, 0, 600, 120);
+    x.fillStyle = "#ffffff";
+    x.textAlign = "center";
+    x.font = "bold 46px Arial";
+    x.fillText("Creova", 300, 78);
+    x.fillStyle = "#2a1a5e";
+    x.font = "bold 36px Arial";
+    x.fillText(name.length > 24 ? name.slice(0, 23) + "…" : name, 300, 190);
+    x.drawImage(qr, 100, 230, 400, 400);
+    x.fillStyle = "#555555";
+    x.font = "26px Arial";
+    x.fillText("Scan to visit my shop", 300, 685);
+    x.font = "20px Arial";
+    x.fillText("Create. Sell. Earn.", 300, 730);
+    const a = document.createElement("a");
+    a.href = c.toDataURL("image/png");
+    a.download = "creova-shop.png";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  if (!shop) {
+    page.innerHTML = '<p class="sub" style="padding:16px">Shop not found.</p>';
+  } else {
+    const isOwner = !!(shop.user && me && me.contact === shop.owner);
+
+    let det = {};
+    if (shop.user) {
+      try { det = (JSON.parse(localStorage.getItem("creovaDetails")) || {})[shop.owner] || {}; } catch (e) { det = {}; }
+      if (!det.phone && /^0\d{9}$/.test(shop.owner)) det.phone = shop.owner;
+    }
+
+    let body;
+    if (shop.user) {
+      const list = getProducts()
+        .filter(function (p) { return p.owner === shop.owner; })
+        .map(function (p) {
+          return {
+            id: p.id, title: p.title, category: p.category, images: p.images,
+            price: "UGX " + Number(p.price).toLocaleString(),
+            colours: p.colours, code: p.code, created: p.created, boostUntil: p.boostUntil
+          };
+        })
+        .sort(function (a, b) { return (isBoosted(b) ? 1 : 0) - (isBoosted(a) ? 1 : 0); });
+      body = list.length
+        ? '<div class="grid2">' + list.map(function (p) { return gridCard(p, isOwner); }).join("") + "</div>"
+        : '<p class="sub" style="padding:0 16px">No products yet.</p>';
+    } else {
+      body = '<div class="product-list">' + shop.items.map(function (i) {
+        return '<div class="product"><b>' + esc(i.name) + "</b><span>" + esc(i.price) + "</span></div>";
+      }).join("") + "</div>";
+    }
+
+    const link = isOwner ? shopLink(me.contact, me.name) : "";
+
+    page.innerHTML =
+      '<div class="shop-hero"><div class="avatar big">' + esc(shop.icon) + "</div>" +
+      "<h1>" + esc(shop.name) + (shop.user ? verifiedMark(shop.owner) : "") + "</h1>" +
+      "<small>" + esc(shop.role) + "</small>" +
+      (det.location ? '<p class="loc">📍 ' + esc(det.location) + "</p>" : "") +
+      (det.phone ? '<p class="loc">📞 ' + esc(det.phone) + "</p>" : "") +
+      (shop.bio ? "<p>" + esc(shop.bio) + "</p>" : "") +
+      (det.phone ? contactButtons(det.phone) : "") +
+      (isOwner
+        ? '<a class="add-btn" href="create.html">+ Add product</a> <a class="add-btn" style="background:#b07a00" href="premium.html">⭐ Boost / Premium</a>'
+        : followButton(shop.id) + (shop.user ? '<button type="button" class="msg-btn small" id="msgShop">💬 Message</button>' : "")) +
+      "</div>" +
+      (isOwner ? sharePanel(link) : "") +
+      '<div class="section-head"><h2>Products &amp; Services</h2></div>' +
+      body;
+
+    wireFollowButtons();
+const msgShop = document.getElementById("msgShop");
+    if (msgShop) {
+      msgShop.onclick = function () {
+        if (!me) { alert("Please log in to message the seller."); location.href = "login.html"; return; }
+        const cid = startChat(me, shop.owner, shop.name);
+        location.href = "chat.html?c=" + encodeURIComponent(cid);
+      };
+    }
+    document.querySelectorAll(".copy").forEach(function (b) {
+      b.onclick = function () { copyText(b.dataset.num, b); };
+    });
+
+    document.querySelectorAll(".del").forEach(function (btn) {
+      btn.onclick = function () {
+        if (!confirm("Delete this product?")) return;
+        const rest = getProducts().filter(function (p) { return String(p.id) !== btn.dataset.id; });
+        localStorage.setItem("creovaProducts", JSON.stringify(rest));
+        location.reload();
+      };
+    });
+
+    if (isOwner) {
+      document.getElementById("copyLink").onclick = function () { copyText(link, this); };
+      document.getElementById("shareBtn").onclick = function () {
+        if (navigator.share) {
+          navigator.share({ title: shop.name, text: "Shop with me on Creova", url: link }).catch(function () {});
+        } else {
+          copyText(link, this);
+        }
+      };
+      document.getElementById("waShare").href =
+        "https://wa.me/?text=" + encodeURIComponent("Shop with me on Creova 🛍️ " + link);
+
+      if (typeof QRCode !== "undefined") {
+        new QRCode(document.getElementById("qrBox"), { text: link, width: 400, height: 400 });
+        document.getElementById("dlCard").onclick = function () { downloadCard(shop.name, link); };
+      } else {
+        document.getElementById("dlCard").hidden = true;
+      }
+
+      if (location.hash === "#share") document.getElementById("share").scrollIntoView();
+    }
+  }
+</script>
+<script src="install.js"></script>
+</body>
+</html>

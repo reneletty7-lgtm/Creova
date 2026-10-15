@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Creova - All Shops</title>
+  <link rel="stylesheet" href="marketplace.css">
+</head>
+<body>
+<div class="section-head">
+  <h2><a href="marketplace.html" style="color:#3a1a85">‹</a> All Shops</h2>
+</div>
+<div class="shop-grid" id="shopGrid"></div>
+
+<nav class="bottom-nav">
+  <a href="home.html"><span class="icon">🏠</span>Home</a>
+  <a href="create.html"><span class="icon">✏️</span>Create</a>
+  <a href="marketplace.html"><span class="icon">🛍️</span>Marketplace</a>
+  <a href="wallet.html"><span class="icon">👛</span>Wallet</a>
+  <a href="profile.html"><span class="icon">👤</span>Profile</a>
+</nav>
+
+<script src="nav.js"></script>
+<script src="premium-core.js"></script>
+<script src="shops.js"></script>
+<script>
+  document.getElementById("shopGrid").innerHTML = shops.map(creatorCard).join("");
+  wireFollowButtons();
+</script>
+<script src="install.js"></script>
+</body>
+</html>
